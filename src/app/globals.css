@@ -2,25 +2,30 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #22303b;
+
+  /* L.A New Age brand palette */
+  --color-navy: #1b2a38;
+  --color-steel: #3e5061;
+  --color-orange: #e85d25;
+  --color-light-gray: #f4f5f6;
+  --color-mid-gray: #6b7680;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-navy: var(--color-navy);
+  --color-brand-steel: var(--color-steel);
+  --color-brand-orange: var(--color-orange);
+  --color-brand-light: var(--color-light-gray);
+  --color-brand-mid: var(--color-mid-gray);
+  --font-display: var(--font-oswald);
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
