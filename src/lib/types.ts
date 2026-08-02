@@ -9,5 +9,6 @@ export type Product = {
   description: string;
   image_url: string | null;
   in_stock: boolean;
+  condition: "new" | "used";
   created_at: string;
 };

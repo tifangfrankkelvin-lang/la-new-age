@@ -2,7 +2,38 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AddToCartButton from "@/components/AddToCartButton";
+import type { Metadata } from "next";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data: part } = await supabase
+    .from("products")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (!part) {
+    return { title: "Part Not Found | L.A New Age" };
+  }
+
+  const title = `${part.name} — ${part.fitment} | L.A New Age`;
+  const description = `${part.name} for ${part.fitment}. Part #${part.part_number}. $${part.price}. ${part.description}`.slice(0, 160);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: part.image_url ? [part.image_url] : [],
+    },
+  };
+}
 export default async function ProductPage({
   params,
 }: {
@@ -20,8 +51,38 @@ export default async function ProductPage({
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: part.name,
+    description: part.description,
+    sku: part.part_number,
+    image: part.image_url ? [part.image_url] : undefined,
+    brand: {
+      "@type": "Brand",
+      name: "L.A New Age",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${process.env.NEXT_PUBLIC_SITE_URL}/shop/${part.slug}`,
+      priceCurrency: "USD",
+      price: part.price,
+      availability: part.in_stock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition:
+        part.condition === "new"
+          ? "https://schema.org/NewCondition"
+          : "https://schema.org/UsedCondition",
+    },
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <nav className="text-xs text-brand-mid mb-6">
         <Link href="/" className="hover:text-brand-orange">
           Home
@@ -52,7 +113,7 @@ export default async function ProductPage({
 
         <div>
           <p className="text-xs uppercase tracking-widest text-brand-orange mb-2">
-            {part.category}
+            {part.category} · {part.condition === "new" ? "New" : "Used"}
           </p>
           <h1 className="font-display text-3xl uppercase text-brand-navy leading-tight">
             {part.name}

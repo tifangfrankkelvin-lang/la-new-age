@@ -2,6 +2,13 @@ import Link from "next/link";
 import PartCard from "@/components/PartCard";
 import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shop All Truck Parts | L.A New Age",
+  description:
+    "Browse truck parts in Los Angeles — brakes, suspension, lighting, engine parts, and more. Shipping and local pickup available.",
+};
 
 export default async function ShopPage({
   searchParams,

@@ -61,12 +61,7 @@ export default async function AdminProductsPage() {
                   >
                     Edit
                   </Link>
-                  <form
-                    action={deleteProduct.bind(null, p.id)}
-                    className="inline"
-                  >
-                    <DeleteButton />
-                  </form>
+                  <DeleteButton onDelete={deleteProduct.bind(null, p.id)} />
                 </td>
               </tr>
             ))}

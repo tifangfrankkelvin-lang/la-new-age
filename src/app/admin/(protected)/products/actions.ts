@@ -3,12 +3,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function deleteProduct(id: string) {
+export async function deleteProduct(id: string): Promise<{ error?: string }> {
   const supabase = await createClient();
-  await supabase.from("products").delete().eq("id", id);
+  const { error } = await supabase.from("products").delete().eq("id", id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
   revalidatePath("/admin/products");
   revalidatePath("/");
   revalidatePath("/shop");
+  return {};
 }
 
 function parseFormFields(formData: FormData) {
@@ -20,6 +26,7 @@ function parseFormFields(formData: FormData) {
     category: formData.get("category") as string,
     fitment: formData.get("fitment") as string,
     description: formData.get("description") as string,
+    condition: formData.get("condition") as string,
     in_stock: formData.get("in_stock") === "on",
   };
 }

@@ -112,6 +112,21 @@ export default function ProductForm({ initialProduct, action }: Props) {
 
       <div>
         <label className="text-xs uppercase tracking-widest text-brand-mid block mb-1">
+          Condition
+        </label>
+        <select
+          name="condition"
+          required
+          defaultValue={initialProduct?.condition ?? "used"}
+          className="w-full border border-brand-mid/30 text-sm px-3 py-2 text-brand-steel"
+        >
+          <option value="new">New</option>
+          <option value="used">Used</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs uppercase tracking-widest text-brand-mid block mb-1">
           Category
         </label>
         <select

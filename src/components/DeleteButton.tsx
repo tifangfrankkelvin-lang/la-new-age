@@ -1,17 +1,35 @@
 "use client";
 
-export default function DeleteButton({ label = "Delete" }: { label?: string }) {
+import { useTransition } from "react";
+
+export default function DeleteButton({
+  onDelete,
+  label = "Delete",
+}: {
+  onDelete: () => Promise<{ error?: string }>;
+  label?: string;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleClick() {
+    if (!confirm("Delete this product? This can't be undone.")) return;
+
+    startTransition(async () => {
+      const result = await onDelete();
+      if (result?.error) {
+        alert(`Couldn't delete: ${result.error}`);
+      }
+    });
+  }
+
   return (
     <button
-      type="submit"
-      onClick={(e) => {
-        if (!confirm("Delete this product? This can't be undone.")) {
-          e.preventDefault();
-        }
-      }}
-      className="text-red-600 text-xs font-semibold uppercase hover:underline"
+      type="button"
+      onClick={handleClick}
+      disabled={isPending}
+      className="text-red-600 text-xs font-semibold uppercase hover:underline disabled:opacity-50"
     >
-      {label}
+      {isPending ? "Deleting..." : label}
     </button>
   );
 }
