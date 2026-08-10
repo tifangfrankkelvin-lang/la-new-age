@@ -9,6 +9,7 @@ const SHOP_LINKS = [
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About Us" },
+  { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
   { href: "/order-status", label: "Track an Order" },
 ];
