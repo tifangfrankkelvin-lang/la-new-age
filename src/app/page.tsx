@@ -2,6 +2,7 @@ import Link from "next/link";
 import PartCard from "@/components/PartCard";
 import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
+import Image from "next/image";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,9 +19,9 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="font-display text-4xl md:text-5xl uppercase leading-tight text-brand-navy">
-              Find the right part.
+              Find the right parts
               <br />
-              <span className="text-brand-orange">Fast.</span>
+              <span className="text-brand-orange">Here.</span>
             </h1>
             <p className="mt-4 text-brand-steel max-w-md">
               Quality truck parts sourced and sold out of Los Angeles.
@@ -50,16 +51,31 @@ export default async function Home() {
               </Link>
             </div>
 
-            <p className="mt-4 text-xs text-brand-mid">
+           <p className="mt-4 text-xs text-brand-mid">
               Shipping &amp; local LA pickup available · Secure order process
             </p>
+
+            {/* Storefront photo — mobile-only wide banner, sits below existing content */}
+            <div className="md:hidden mt-8 relative aspect-[16/9] overflow-hidden">
+              <Image
+                src="/storefront.jpeg"
+                alt="L.A New Age storefront, Los Angeles"
+                fill
+                className="object-cover object-top"
+              />
+            </div>
           </div>
 
+          {/* Storefront photo — desktop square crop */}
           <div className="hidden md:block">
-            <div className="aspect-square bg-brand-steel/90 flex items-center justify-center">
-              <span className="font-display text-white/60 uppercase tracking-widest text-sm">
-                Featured Part Photo
-              </span>
+            <div className="aspect-square relative overflow-hidden">
+              <Image
+                src="/storefront.jpeg"
+                alt="L.A New Age storefront, Los Angeles"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </div>

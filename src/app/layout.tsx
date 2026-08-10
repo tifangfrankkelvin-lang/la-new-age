@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/lib/cart-context";
+import FloatingCartButton from "@/components/FloatingCartButton";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <FloatingCartButton />
         </CartProvider>
       </body>
     </html>

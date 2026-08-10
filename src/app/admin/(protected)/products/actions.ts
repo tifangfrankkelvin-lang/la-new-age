@@ -31,33 +31,36 @@ function parseFormFields(formData: FormData) {
   };
 }
 
-async function uploadImageIfPresent(
+async function uploadImages(
   formData: FormData,
   slug: string
-): Promise<string | null> {
+): Promise<string[]> {
   const supabase = await createClient();
-  const file = formData.get("image") as File;
+  const files = formData.getAll("images") as File[];
+  const urls: string[] = [];
 
-  if (!file || file.size === 0) {
-    return null;
+  for (const file of files) {
+    if (!file || file.size === 0) continue;
+
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${slug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
+
+    const { error } = await supabase.storage
+      .from("product-images")
+      .upload(filePath, file);
+
+    if (error) {
+      throw new Error("Image upload failed: " + error.message);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("product-images").getPublicUrl(filePath);
+
+    urls.push(publicUrl);
   }
 
-  const fileExt = file.name.split(".").pop();
-  const filePath = `${slug}-${Date.now()}.${fileExt}`;
-
-  const { error } = await supabase.storage
-    .from("product-images")
-    .upload(filePath, file);
-
-  if (error) {
-    throw new Error("Image upload failed: " + error.message);
-  }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("product-images").getPublicUrl(filePath);
-
-  return publicUrl;
+  return urls;
 }
 
 export async function createProduct(
@@ -66,23 +69,36 @@ export async function createProduct(
   const supabase = await createClient();
   const fields = parseFormFields(formData);
 
-  let image_url: string | null = null;
+  let imageUrls: string[] = [];
   try {
-    image_url = await uploadImageIfPresent(formData, fields.slug);
+    imageUrls = await uploadImages(formData, fields.slug);
   } catch (err) {
     return { error: (err as Error).message };
   }
 
-  const { error } = await supabase.from("products").insert({
-    ...fields,
-    image_url,
-  });
+  const { data: product, error } = await supabase
+    .from("products")
+    .insert({
+      ...fields,
+      image_url: imageUrls[0] ?? null, // first photo = cover photo
+    })
+    .select()
+    .single();
 
-  if (error) {
-    if (error.code === "23505") {
+  if (error || !product) {
+    if (error?.code === "23505") {
       return { error: "That URL slug is already in use — try a different one." };
     }
-    return { error: error.message };
+    return { error: error?.message ?? "Something went wrong." };
+  }
+
+  if (imageUrls.length > 0) {
+    const rows = imageUrls.map((url, i) => ({
+      product_id: product.id,
+      image_url: url,
+      sort_order: i,
+    }));
+    await supabase.from("product_images").insert(rows);
   }
 
   revalidatePath("/admin/products");
@@ -98,16 +114,43 @@ export async function updateProduct(
   const supabase = await createClient();
   const fields = parseFormFields(formData);
 
-  let image_url: string | null = null;
+  let imageUrls: string[] = [];
   try {
-    image_url = await uploadImageIfPresent(formData, fields.slug);
+    imageUrls = await uploadImages(formData, fields.slug);
   } catch (err) {
     return { error: (err as Error).message };
   }
 
   const updateData: Record<string, unknown> = { ...fields };
-  if (image_url) {
-    updateData.image_url = image_url;
+
+  if (imageUrls.length > 0) {
+    // Get current highest sort_order to append after existing photos
+    const { data: existing } = await supabase
+      .from("product_images")
+      .select("sort_order")
+      .eq("product_id", id)
+      .order("sort_order", { ascending: false })
+      .limit(1);
+
+    const startOrder = existing && existing.length > 0 ? existing[0].sort_order + 1 : 0;
+
+    const rows = imageUrls.map((url, i) => ({
+      product_id: id,
+      image_url: url,
+      sort_order: startOrder + i,
+    }));
+    await supabase.from("product_images").insert(rows);
+
+    // If there's no cover photo yet, use the first newly uploaded one
+    const { data: currentProduct } = await supabase
+      .from("products")
+      .select("image_url")
+      .eq("id", id)
+      .single();
+
+    if (!currentProduct?.image_url) {
+      updateData.image_url = imageUrls[0];
+    }
   }
 
   const { error } = await supabase
@@ -126,5 +169,46 @@ export async function updateProduct(
   revalidatePath("/");
   revalidatePath("/shop");
   revalidatePath(`/shop/${fields.slug}`);
+  return {};
+}
+
+export async function deleteProductImage(
+  imageId: string,
+  productSlug: string
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("product_images")
+    .delete()
+    .eq("id", imageId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath(`/admin/products`);
+  revalidatePath(`/shop/${productSlug}`);
+  return {};
+}
+
+export async function setCoverPhoto(
+  productId: string,
+  imageUrl: string,
+  productSlug: string
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("products")
+    .update({ image_url: imageUrl })
+    .eq("id", productId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/shop");
+  revalidatePath(`/shop/${productSlug}`);
   return {};
 }

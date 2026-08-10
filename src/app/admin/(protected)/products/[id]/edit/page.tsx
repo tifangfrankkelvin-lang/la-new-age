@@ -10,6 +10,7 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
+
   const { data: product } = await supabase
     .from("products")
     .select("*")
@@ -20,6 +21,12 @@ export default async function EditProductPage({
     notFound();
   }
 
+  const { data: images } = await supabase
+    .from("product_images")
+    .select("*")
+    .eq("product_id", id)
+    .order("sort_order", { ascending: true });
+
   const updateWithId = updateProduct.bind(null, id);
 
   return (
@@ -27,7 +34,11 @@ export default async function EditProductPage({
       <h1 className="font-display text-3xl uppercase text-brand-navy mb-6">
         Edit Product
       </h1>
-      <ProductForm initialProduct={product} action={updateWithId} />
+      <ProductForm
+        initialProduct={product}
+        initialImages={images ?? []}
+        action={updateWithId}
+      />
     </div>
   );
 }

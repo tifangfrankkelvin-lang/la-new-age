@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AddToCartButton from "@/components/AddToCartButton";
 import type { Metadata } from "next";
+import ProductGallery from "@/components/ProductGallery";
 
 export async function generateMetadata({
   params,
@@ -41,7 +42,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: part } = await supabase
+ const { data: part } = await supabase
     .from("products")
     .select("*")
     .eq("slug", slug)
@@ -51,13 +52,25 @@ export default async function ProductPage({
     notFound();
   }
 
+  const { data: gallery } = await supabase
+    .from("product_images")
+    .select("image_url")
+    .eq("product_id", part.id)
+    .order("sort_order", { ascending: true });
+
+  // Cover photo first, then the rest of the gallery, no duplicates
+  const galleryUrls = (gallery ?? []).map((img) => img.image_url);
+  const allImages = part.image_url
+    ? [part.image_url, ...galleryUrls.filter((url) => url !== part.image_url)]
+    : galleryUrls;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: part.name,
     description: part.description,
     sku: part.part_number,
-    image: part.image_url ? [part.image_url] : undefined,
+    image: allImages.length > 0 ? allImages : undefined,
     brand: {
       "@type": "Brand",
       name: "L.A New Age",
@@ -96,20 +109,7 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid md:grid-cols-2 gap-10">
-        <div className="aspect-square flex items-center justify-center bg-brand-steel">
-          {part.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={part.image_url}
-              alt={part.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-white/70 uppercase tracking-widest text-sm font-display">
-              {part.category}
-            </span>
-          )}
-        </div>
+        <ProductGallery images={allImages} productName={part.name} />
 
         <div>
           <p className="text-xs uppercase tracking-widest text-brand-orange mb-2">
