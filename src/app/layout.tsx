@@ -18,9 +18,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
   title: "L.A New Age | Truck Parts, Los Angeles",
   description:
     "Quality truck parts in Los Angeles. Browse by make, model, and year, with shipping and local pickup available.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
