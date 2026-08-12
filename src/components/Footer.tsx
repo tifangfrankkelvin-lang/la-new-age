@@ -12,6 +12,7 @@ const COMPANY_LINKS = [
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
   { href: "/order-status", label: "Track an Order" },
+  { href: "/returns", label: "Returns & Refunds" },
 ];
 
 export default function Footer() {
