@@ -9,22 +9,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data: products } = await supabase
     .from("products")
-    .select("slug, created_at, updated_at");
+    .select("slug, created_at");
 
   const productUrls = (products ?? []).map((p) => ({
     url: `${baseUrl}/shop/${p.slug}`,
-    lastModified: new Date(p.updated_at ?? p.created_at),
+    lastModified: new Date(p.created_at),
   }));
 
-  const now = new Date();
-
   return [
-    { url: baseUrl, lastModified: now },
-    { url: `${baseUrl}/shop`, lastModified: now },
-    { url: `${baseUrl}/about`, lastModified: now },
-    { url: `${baseUrl}/contact`, lastModified: now },
-    { url: `${baseUrl}/faq`, lastModified: now },
-    { url: `${baseUrl}/returns`, lastModified: now },
+    { url: baseUrl },
+    { url: `${baseUrl}/shop` },
+    { url: `${baseUrl}/about` },
+    { url: `${baseUrl}/contact` },
+    { url: `${baseUrl}/faq` },
+    { url: `${baseUrl}/returns` },
     ...productUrls,
   ];
 }
