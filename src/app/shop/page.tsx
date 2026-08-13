@@ -10,6 +10,29 @@ export const metadata: Metadata = {
     "Browse truck parts in Los Angeles — brakes, suspension, lighting, engine parts, and more. Shipping and local pickup available.",
 };
 
+// Keep the customer-facing category label stable while accepting the common
+// legacy spellings that may already exist in the products table.
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  "Body & Mirrors": [
+    "Body & Mirrors",
+    "Body and Mirrors",
+    "Body/Mirrors",
+    "Body & Mirror",
+    "Body",
+    "Mirrors",
+  ],
+};
+
+function getCategoryFilter(category: string) {
+  const canonical = CATEGORIES.find(
+    (item) => item.toLowerCase() === category.toLowerCase(),
+  );
+
+  if (!canonical) return null;
+
+  return CATEGORY_ALIASES[canonical] ?? [canonical];
+}
+
 export default async function ShopPage({
   searchParams,
 }: {
@@ -24,8 +47,20 @@ export default async function ShopPage({
     .order("created_at", { ascending: false });
 
   if (category) {
-    query = query.ilike("category", category);
+    const categoryValues = getCategoryFilter(category);
+
+    if (categoryValues) {
+      query =
+        categoryValues.length === 1
+          ? query.ilike("category", categoryValues[0])
+          : query.or(
+              categoryValues
+                .map((value) => `category.ilike.${value}`)
+                .join(","),
+            );
+    }
   }
+
   if (q) {
     query = query.or(`name.ilike.%${q}%,fitment.ilike.%${q}%`);
   }
