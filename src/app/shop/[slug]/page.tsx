@@ -5,6 +5,8 @@ import AddToCartButton from "@/components/AddToCartButton";
 import type { Metadata } from "next";
 import ProductGallery from "@/components/ProductGallery";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+
 export async function generateMetadata({
   params,
 }: {
@@ -28,16 +30,24 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: {
-      canonical: `/shop/${part.slug}`,
-    },
+    alternates: { canonical: `/shop/${part.slug}` },
     openGraph: {
+      type: "website",
+      title,
+      description,
+      url: `/shop/${part.slug}`,
+      siteName: "L.A New Age",
+      images: part.image_url ? [part.image_url] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
       title,
       description,
       images: part.image_url ? [part.image_url] : [],
     },
   };
 }
+
 export default async function ProductPage({
   params,
 }: {
@@ -45,7 +55,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
- const { data: part } = await supabase
+  const { data: part } = await supabase
     .from("products")
     .select("*")
     .eq("slug", slug)
@@ -61,12 +71,12 @@ export default async function ProductPage({
     .eq("product_id", part.id)
     .order("sort_order", { ascending: true });
 
-  // Cover photo first, then the rest of the gallery, no duplicates
   const galleryUrls = (gallery ?? []).map((img) => img.image_url);
   const allImages = part.image_url
     ? [part.image_url, ...galleryUrls.filter((url) => url !== part.image_url)]
     : galleryUrls;
 
+  const productUrl = `${siteUrl}/shop/${part.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -74,13 +84,11 @@ export default async function ProductPage({
     description: part.description,
     sku: part.part_number,
     image: allImages.length > 0 ? allImages : undefined,
-    brand: {
-      "@type": "Brand",
-      name: "L.A New Age",
-    },
+    brand: { "@type": "Brand", name: "L.A New Age" },
+    category: part.category,
     offers: {
       "@type": "Offer",
-      url: `${process.env.NEXT_PUBLIC_SITE_URL}/shop/${part.slug}`,
+      url: productUrl,
       priceCurrency: "USD",
       price: part.price,
       availability: part.in_stock
@@ -90,67 +98,52 @@ export default async function ProductPage({
         part.condition === "new"
           ? "https://schema.org/NewCondition"
           : "https://schema.org/UsedCondition",
+      seller: { "@type": "Organization", name: "L.A New Age", url: siteUrl },
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Shop", item: `${siteUrl}/shop` },
+      { "@type": "ListItem", position: 3, name: part.name, item: productUrl },
+    ],
+  };
+
   return (
-    <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <nav className="text-xs text-brand-mid mb-6">
-        <Link href="/" className="hover:text-brand-orange">
-          Home
-        </Link>
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <nav aria-label="Breadcrumb" className="mb-6 text-xs text-brand-mid">
+        <Link href="/" className="hover:text-brand-orange">Home</Link>
         <span className="mx-2">/</span>
-        <Link href="/shop" className="hover:text-brand-orange">
-          Shop
-        </Link>
+        <Link href="/shop" className="hover:text-brand-orange">Shop</Link>
         <span className="mx-2">/</span>
         <span className="text-brand-navy">{part.name}</span>
       </nav>
 
-      <div className="grid md:grid-cols-2 gap-10">
+      <div className="grid gap-10 md:grid-cols-2">
         <ProductGallery images={allImages} productName={part.name} />
 
         <div>
-          <p className="text-xs uppercase tracking-widest text-brand-orange mb-2">
+          <p className="mb-2 text-xs uppercase tracking-widest text-brand-orange">
             {part.category} · {part.condition === "new" ? "New" : "Used"}
           </p>
-          <h1 className="font-display text-3xl uppercase text-brand-navy leading-tight">
-            {part.name}
-          </h1>
-          <p className="text-brand-mid text-sm mt-2">Fits: {part.fitment}</p>
-          <p className="font-mono text-xs text-brand-mid mt-1">
-            Part #{part.part_number}
-          </p>
-
-          <p className="font-display text-3xl text-brand-orange mt-6">
-            ${part.price}
-          </p>
-
-          <p className="text-brand-steel text-sm leading-relaxed mt-4">
-            {part.description}
-          </p>
+          <h1 className="font-display text-3xl uppercase leading-tight text-brand-navy">{part.name}</h1>
+          <p className="mt-2 text-sm text-brand-mid">Fits: {part.fitment}</p>
+          <p className="mt-1 font-mono text-xs text-brand-mid">Part #{part.part_number}</p>
+          <p className="mt-6 font-display text-3xl text-brand-orange">${part.price}</p>
+          <p className="mt-4 text-sm leading-relaxed text-brand-steel">{part.description}</p>
 
           {part.in_stock ? (
-            <AddToCartButton
-              id={part.id}
-              slug={part.slug}
-              name={part.name}
-              price={part.price}
-              partNumber={part.part_number}
-            />
+            <AddToCartButton id={part.id} slug={part.slug} name={part.name} price={part.price} partNumber={part.part_number} />
           ) : (
-            <p className="mt-8 inline-block px-8 py-3 bg-brand-mid/20 text-brand-mid text-sm font-semibold uppercase tracking-wide">
-              Sold Out
-            </p>
+            <p className="mt-8 inline-block bg-brand-mid/20 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-brand-mid">Sold Out</p>
           )}
 
-          <p className="text-xs text-brand-mid mt-3">
-            Shipping &amp; local LA pickup available at checkout.
-          </p>
+          <p className="mt-3 text-xs text-brand-mid">Shipping &amp; local LA pickup available at checkout.</p>
         </div>
       </div>
     </div>

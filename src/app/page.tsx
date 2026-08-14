@@ -4,6 +4,15 @@ import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 
+const CATEGORY_META: Record<string, { eyebrow: string; description: string }> = {
+  Brakes: { eyebrow: "Control", description: "Stopping power, pads, rotors, and hardware." },
+  Suspension: { eyebrow: "Ride", description: "Components built for confident handling." },
+  Engine: { eyebrow: "Performance", description: "Keep your truck working at its best." },
+  Electrical: { eyebrow: "Systems", description: "Reliable electrical and starting components." },
+  Exterior: { eyebrow: "Body", description: "Exterior parts to keep your truck complete." },
+  Interior: { eyebrow: "Cab", description: "Practical parts for the inside of your truck." },
+};
+
 export default async function Home() {
   const supabase = await createClient();
   const { data: parts } = await supabase
@@ -13,143 +22,150 @@ export default async function Home() {
     .limit(4);
 
   return (
-    <div>
+    <div className="overflow-hidden">
       {/* HERO */}
-      <section className="bg-brand-light border-b border-brand-mid/20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
+      <section className="relative bg-brand-navy text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(232,93,37,0.18),transparent_34%)]" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.05fr_.95fr] md:py-20 lg:gap-16 lg:py-24">
           <div>
-            <h1 className="font-display text-4xl md:text-5xl uppercase leading-tight text-brand-navy">
-              Find the right parts
-              <br />
-              <span className="text-brand-orange">Here.</span>
+            <div className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
+              <span className="h-px w-8 bg-brand-orange" />
+              Los Angeles · Truck Parts
+            </div>
+            <h1 className="max-w-xl font-display text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+              Parts that keep your truck <span className="text-brand-orange">moving.</span>
             </h1>
-            <p className="mt-4 text-brand-steel max-w-md">
-              Quality truck parts sourced and sold out of Los Angeles.
-              Shipping nationwide, or pick up locally.
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/70 sm:text-lg">
+              Quality truck parts, sourced in Los Angeles and ready to ship nationwide or pick up locally.
             </p>
 
-            <div className="mt-8 bg-white border border-brand-mid/30 p-5 max-w-md">
-              <p className="text-xs uppercase tracking-widest text-brand-mid mb-3">
-                Find parts for your truck
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <select className="border border-brand-mid/30 text-sm px-2 py-2 text-brand-steel">
-                  <option>Make</option>
-                </select>
-                <select className="border border-brand-mid/30 text-sm px-2 py-2 text-brand-steel">
-                  <option>Model</option>
-                </select>
-                <select className="border border-brand-mid/30 text-sm px-2 py-2 text-brand-steel">
-                  <option>Year</option>
-                </select>
-              </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/shop"
-                className="mt-3 block text-center bg-brand-navy text-white text-sm font-semibold uppercase tracking-wide py-2.5 hover:bg-brand-orange transition-colors"
+                className="inline-flex items-center justify-center gap-3 bg-brand-orange px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-white hover:text-brand-navy"
               >
-                Find Parts
+                Shop all parts
+                <span aria-hidden>→</span>
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center border border-white/25 px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition hover:border-white hover:bg-white/10"
+              >
+                Need help finding a part?
               </Link>
             </div>
 
-           <p className="mt-4 text-xs text-brand-mid">
-              Shipping &amp; local LA pickup available · Secure order process
-            </p>
-
-            {/* Storefront photo — mobile-only wide banner, sits below existing content */}
-            <div className="md:hidden mt-8 relative aspect-[16/9] overflow-hidden">
-              <Image
-                src="/storefront.jpeg"
-                alt="L.A New Age storefront, Los Angeles"
-                fill
-                className="object-cover object-top"
-              />
+            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-5 text-xs uppercase tracking-wider text-white/50">
+              <span>Nationwide shipping</span>
+              <span>Local LA pickup</span>
+              <span>Real parts support</span>
             </div>
           </div>
 
-          {/* Storefront photo — desktop square crop */}
-          <div className="hidden md:block">
-            <div className="aspect-square relative overflow-hidden">
+          <div className="relative">
+            <div className="absolute -inset-3 border border-brand-orange/25" />
+            <div className="relative aspect-[4/5] overflow-hidden bg-brand-steel sm:aspect-square">
               <Image
                 src="/storefront.jpeg"
-                alt="L.A New Age storefront, Los Angeles"
+                alt="L.A New Age storefront in Los Angeles"
                 fill
-                className="object-cover"
+                className="object-cover transition duration-700 hover:scale-105"
                 priority
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/55 via-transparent to-transparent" />
+              <div className="absolute bottom-5 left-5 border-l-2 border-brand-orange pl-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Since day one</p>
+                <p className="mt-1 font-display text-xl uppercase text-white">Built around trucks.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CATEGORIES */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-        <h2 className="font-display text-2xl uppercase text-brand-navy mb-6">
-          Browse by Category
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat}
-              href={`/shop?category=${cat.toLowerCase()}`}
-              className="px-4 py-2 border border-brand-mid/30 text-sm uppercase tracking-wide text-brand-steel hover:border-brand-orange hover:text-brand-orange transition-colors"
-            >
-              {cat}
-            </Link>
+      {/* QUICK VALUE STRIP */}
+      <section className="border-b border-brand-mid/15 bg-white">
+        <div className="mx-auto grid max-w-6xl divide-y divide-brand-mid/15 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
+          {[
+            ["01", "Know what you need?", "Go straight to the parts catalog."],
+            ["02", "Not sure what fits?", "Talk to us before you order."],
+            ["03", "Ready to buy?", "Order online and choose shipping or pickup."],
+          ].map(([number, title, text]) => (
+            <div key={number} className="flex gap-4 py-6 md:px-7 md:first:pl-0 md:last:pr-0">
+              <span className="font-display text-sm text-brand-orange">{number}</span>
+              <div>
+                <p className="text-sm font-bold uppercase tracking-wide text-brand-navy">{title}</p>
+                <p className="mt-1 text-sm leading-5 text-brand-mid">{text}</p>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-2xl uppercase text-brand-navy">
-            New Arrivals
-          </h2>
-          <Link
-            href="/shop"
-            className="text-sm font-semibold uppercase tracking-wide text-brand-orange hover:underline"
-          >
-            View All
+      {/* CATEGORIES */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+        <div className="mb-8 flex items-end justify-between gap-6">
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">Start here</p>
+            <h2 className="font-display text-3xl uppercase tracking-tight text-brand-navy sm:text-4xl">Shop by category</h2>
+          </div>
+          <Link href="/shop" className="hidden text-sm font-bold uppercase tracking-wider text-brand-navy transition hover:text-brand-orange sm:block">
+            View catalog →
           </Link>
         </div>
-        {parts && parts.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {parts.map((part) => (
-              <PartCard key={part.id} part={part} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-brand-mid">
-            No parts listed yet — check back soon.
-          </p>
-        )}
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+          {CATEGORIES.map((cat, index) => {
+            const meta = CATEGORY_META[cat] ?? { eyebrow: `Category ${String(index + 1).padStart(2, "0")}`, description: "Browse available truck parts." };
+            return (
+              <Link
+                key={cat}
+                href={`/shop?category=${cat.toLowerCase()}`}
+                className="group relative min-h-40 overflow-hidden border border-brand-mid/20 bg-brand-light p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-orange hover:shadow-[0_16px_35px_rgba(27,42,56,0.10)] sm:min-h-48 sm:p-6"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange">{meta.eyebrow}</span>
+                <h3 className="mt-3 font-display text-2xl uppercase text-brand-navy">{cat}</h3>
+                <p className="mt-2 max-w-xs text-xs leading-5 text-brand-mid sm:text-sm">{meta.description}</p>
+                <span className="absolute bottom-5 right-5 text-xl text-brand-navy transition group-hover:translate-x-1 group-hover:text-brand-orange" aria-hidden>↗</span>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
-      {/* TRUST STRIP */}
+      {/* NEW ARRIVALS */}
+      <section className="bg-brand-light/70 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-8 flex items-end justify-between gap-6">
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">Fresh inventory</p>
+              <h2 className="font-display text-3xl uppercase tracking-tight text-brand-navy sm:text-4xl">New arrivals</h2>
+            </div>
+            <Link href="/shop" className="text-sm font-bold uppercase tracking-wider text-brand-navy transition hover:text-brand-orange">
+              View all →
+            </Link>
+          </div>
+          {parts && parts.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+              {parts.map((part) => <PartCard key={part.id} part={part} />)}
+            </div>
+          ) : (
+            <div className="border border-dashed border-brand-mid/30 bg-white p-10 text-center">
+              <p className="text-sm text-brand-mid">No parts listed yet — check back soon.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* BRAND CTA */}
       <section className="bg-brand-navy text-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1fr_auto] md:items-end md:py-20">
           <div>
-            <p className="font-display text-lg uppercase mb-1">LA-Based</p>
-            <p className="text-sm text-white/70">
-              Local pickup available for buyers in the Los Angeles area.
-            </p>
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">Can&apos;t find it?</p>
+            <h2 className="max-w-2xl font-display text-4xl uppercase leading-none sm:text-5xl">Tell us what your truck needs.</h2>
+            <p className="mt-5 max-w-xl text-sm leading-6 text-white/65 sm:text-base">Questions about fitment or a part that isn&apos;t listed? Reach out and we&apos;ll help you find the right option.</p>
           </div>
-          <div>
-            <p className="font-display text-lg uppercase mb-1">
-              Simple Ordering
-            </p>
-            <p className="text-sm text-white/70">
-              Submit your order, get payment instructions by email, done.
-            </p>
-          </div>
-          <div>
-            <p className="font-display text-lg uppercase mb-1">
-              Real Parts People
-            </p>
-            <p className="text-sm text-white/70">
-              Questions about fitment? Reach out before you buy.
-            </p>
-          </div>
+          <Link href="/contact" className="inline-flex items-center justify-center border border-white/30 px-6 py-3.5 text-sm font-bold uppercase tracking-wider transition hover:border-brand-orange hover:bg-brand-orange">
+            Contact us →
+          </Link>
         </div>
       </section>
     </div>

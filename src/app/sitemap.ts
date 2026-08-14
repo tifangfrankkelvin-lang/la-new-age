@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -15,13 +16,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(p.created_at),
   }));
 
- return [
-    { url: baseUrl, lastModified: new Date() },
-    { url: `${baseUrl}/shop`, lastModified: new Date() },
-    { url: `${baseUrl}/about`, lastModified: new Date() },
-    { url: `${baseUrl}/contact`, lastModified: new Date() },
-    { url: `${baseUrl}/faq`, lastModified: new Date() },
-    { url: `${baseUrl}/returns`, lastModified: new Date() },
+  return [
+    { url: baseUrl },
+    { url: `${baseUrl}/shop` },
+    { url: `${baseUrl}/about` },
+    { url: `${baseUrl}/contact` },
+    { url: `${baseUrl}/faq` },
+    { url: `${baseUrl}/returns` },
     ...productUrls,
   ];
 }

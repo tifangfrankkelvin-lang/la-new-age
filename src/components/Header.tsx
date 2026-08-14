@@ -16,110 +16,94 @@ export default function Header() {
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-brand-mid/20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-16">
+    <header className="sticky top-0 z-50 border-b border-brand-mid/15 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="font-display text-xl tracking-wide text-brand-navy uppercase hover:text-brand-orange transition-colors"
+          className="group flex items-center gap-3"
+          aria-label="L.A New Age home"
         >
-          L.A New Age
+          <span className="flex h-8 w-8 items-center justify-center bg-brand-navy font-display text-sm text-white transition-colors group-hover:bg-brand-orange">LA</span>
+          <span className="font-display text-xl uppercase tracking-wide text-brand-navy transition-colors group-hover:text-brand-orange sm:text-2xl">
+            L.A New Age
+          </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium tracking-wide uppercase text-brand-steel hover:text-brand-orange transition-colors"
+              className="text-xs font-bold uppercase tracking-[0.14em] text-brand-steel transition-colors hover:text-brand-orange"
             >
               {link.label}
             </Link>
           ))}
-         <Link
+          <Link
             href="/cart"
-            className="relative text-brand-steel hover:text-brand-orange transition-colors"
-            aria-label="View cart"
+            className="relative text-brand-steel transition-colors hover:text-brand-orange"
+            aria-label={`View cart${itemCount > 0 ? `, ${itemCount} items` : ""}`}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 3h2l2.4 12.4a2 2 0 002 1.6h8.7a2 2 0 002-1.6L21 8H6"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 3h2l2.4 12.4a2 2 0 002 1.6h8.7a2 2 0 002-1.6L21 8H6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="9" cy="20" r="1.4" fill="currentColor" />
               <circle cx="17" cy="20" r="1.4" fill="currentColor" />
             </svg>
             {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-brand-orange text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute -right-2.5 -top-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-orange px-1 text-[9px] font-bold text-white">
                 {itemCount}
               </span>
             )}
           </Link>
           <Link
             href="/order-status"
-            className="text-sm font-semibold uppercase tracking-wide border border-brand-navy text-brand-navy px-4 py-2 hover:bg-brand-navy hover:text-white transition-colors"
+            className="border border-brand-navy px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-brand-navy transition hover:bg-brand-navy hover:text-white"
           >
-            Track Order
+            Track order
           </Link>
         </nav>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden text-brand-navy"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            {menuOpen ? (
-              <path
-                d="M6 6L18 18M6 18L18 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            ) : (
-              <path
-                d="M3 6H21M3 12H21M3 18H21"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            )}
-          </svg>
-        </button>
+        <div className="flex items-center gap-4 md:hidden">
+          <Link href="/cart" className="relative text-brand-navy" aria-label={`View cart${itemCount > 0 ? `, ${itemCount} items` : ""}`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 3h2l2.4 12.4a2 2 0 002 1.6h8.7a2 2 0 002-1.6L21 8H6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="9" cy="20" r="1.4" fill="currentColor" />
+              <circle cx="17" cy="20" r="1.4" fill="currentColor" />
+            </svg>
+            {itemCount > 0 && <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-orange px-1 text-[9px] font-bold text-white">{itemCount}</span>}
+          </Link>
+          <button
+            className="text-brand-navy"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+          >
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              {menuOpen ? (
+                <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              ) : (
+                <path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Mobile nav */}
       {menuOpen && (
-        <nav className="md:hidden border-t border-brand-mid/20 bg-white">
-          <div className="flex flex-col px-4 py-3">
+        <nav className="border-t border-brand-mid/15 bg-white md:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="py-3 text-sm font-medium uppercase tracking-wide text-brand-steel border-b border-brand-mid/10"
+                className="border-b border-brand-mid/10 py-4 text-xs font-bold uppercase tracking-[0.14em] text-brand-steel transition-colors hover:text-brand-orange"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/cart"
-              className="py-3 text-sm font-medium uppercase tracking-wide text-brand-steel border-b border-brand-mid/10"
-              onClick={() => setMenuOpen(false)}
-            >
-              Cart{itemCount > 0 ? ` (${itemCount})` : ""}
-            </Link>
-            <Link
-              href="/order-status"
-              className="py-3 text-sm font-semibold uppercase tracking-wide text-brand-orange"
-              onClick={() => setMenuOpen(false)}
-            >
-              Track Order
+            <Link href="/order-status" className="py-4 text-xs font-bold uppercase tracking-[0.14em] text-brand-orange" onClick={() => setMenuOpen(false)}>
+              Track order
             </Link>
           </div>
         </nav>
