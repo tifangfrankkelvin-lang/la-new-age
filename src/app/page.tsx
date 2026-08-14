@@ -21,8 +21,43 @@ export default async function Home() {
     .order("created_at", { ascending: false })
     .limit(4);
 
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "L.A New Age",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
+    description:
+      "Quality truck parts sourced and sold out of Los Angeles, with nationwide shipping and local pickup.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Los Angeles",
+      addressRegion: "CA",
+      addressCountry: "US",
+    },
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "L.A New Age",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${process.env.NEXT_PUBLIC_SITE_URL}/shop?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       {/* HERO */}
       <section className="relative bg-brand-navy text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(232,93,37,0.18),transparent_34%)]" />

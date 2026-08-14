@@ -19,7 +19,7 @@ export async function sendOrderConfirmationEmail({
 
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>", // swap once your domain is verified
+      from: "L.A New Age <orders@newagetruckparts.com>", 
       to,
       subject: "Your L.A New Age order has been received",
       html: `
@@ -56,7 +56,7 @@ export async function sendAdminNewOrderEmail({
 
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>",
+     from: "L.A New Age <orders@newagetruckparts.com>",
       to: process.env.ADMIN_NOTIFICATION_EMAIL!,
       subject: `New order from ${customerName} — $${total.toFixed(2)}`,
       html: `
@@ -84,7 +84,7 @@ export async function sendCustomerCancellationEmail({
 }) {
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>",
+      from: "L.A New Age <orders@newagetruckparts.com>",
       to,
       subject: "Your L.A New Age order has been canceled",
       html: `
@@ -113,7 +113,7 @@ export async function sendAdminCancellationEmail({
 
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>",
+      from: "L.A New Age <orders@newagetruckparts.com>",
       to: process.env.ADMIN_NOTIFICATION_EMAIL!,
       subject: `Order canceled — ${customerName}`,
       html: `
@@ -143,7 +143,7 @@ export async function sendContactFormEmail({
 }) {
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>",
+      from: "L.A New Age <orders@newagetruckparts.com>",
       to: process.env.ADMIN_NOTIFICATION_EMAIL!,
       replyTo: email,
       subject: `Contact form message from ${name}`,
@@ -180,7 +180,7 @@ export async function sendOrderLookupEmail({
 
   try {
     await resend.emails.send({
-      from: "L.A New Age <onboarding@resend.dev>",
+      from: "L.A New Age <orders@newagetruckparts.com>",
       to,
       subject: "Your L.A New Age order links",
       html: `

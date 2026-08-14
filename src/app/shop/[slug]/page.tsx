@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import AddToCartButton from "@/components/AddToCartButton";
 import type { Metadata } from "next";
 import ProductGallery from "@/components/ProductGallery";
+import RelatedProducts from "@/components/RelatedProducts";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
 
@@ -146,6 +147,8 @@ export default async function ProductPage({
           <p className="mt-3 text-xs text-brand-mid">Shipping &amp; local LA pickup available at checkout.</p>
         </div>
       </div>
+
+      <RelatedProducts currentProductId={part.id} category={part.category} />
     </div>
   );
 }

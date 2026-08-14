@@ -92,8 +92,31 @@ export default async function ShopPage({
   const { data: filtered } = await query;
   const count = filtered?.length ?? 0;
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: process.env.NEXT_PUBLIC_SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Shop",
+        item: `${process.env.NEXT_PUBLIC_SITE_URL}/shop`,
+      },
+    ],
+  };
+
   return (
-    <div className="bg-brand-light/40">
+<div className="bg-brand-light/40">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <section className="border-b border-brand-mid/15 bg-brand-navy text-white">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16">
           <nav className="mb-7 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45" aria-label="Breadcrumb">
