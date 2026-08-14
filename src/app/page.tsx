@@ -85,18 +85,24 @@ export default async function Home() {
       {/* QUICK VALUE STRIP */}
       <section className="border-b border-brand-mid/15 bg-white">
         <div className="mx-auto grid max-w-6xl divide-y divide-brand-mid/15 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
-          {[
-            ["01", "Know what you need?", "Go straight to the parts catalog."],
-            ["02", "Not sure what fits?", "Talk to us before you order."],
-            ["03", "Ready to buy?", "Order online and choose shipping or pickup."],
-          ].map(([number, title, text]) => (
-            <div key={number} className="flex gap-4 py-6 md:px-7 md:first:pl-0 md:last:pr-0">
+        {[
+            ["01", "Know what you need?", "Go straight to the parts catalog.", "/shop"],
+            ["02", "Not sure what fits?", "Talk to us before you order.", "/contact"],
+            ["03", "Ready to buy?", "Order online and choose shipping or pickup.", "/shop"],
+          ].map(([number, title, text, href]) => (
+            <Link
+              key={number}
+              href={href}
+              className="group flex gap-4 py-6 transition-colors md:px-7 md:first:pl-0 md:last:pr-0"
+            >
               <span className="font-display text-sm text-brand-orange">{number}</span>
               <div>
-                <p className="text-sm font-bold uppercase tracking-wide text-brand-navy">{title}</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-brand-navy transition-colors group-hover:text-brand-orange">
+                  {title}
+                </p>
                 <p className="mt-1 text-sm leading-5 text-brand-mid">{text}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
