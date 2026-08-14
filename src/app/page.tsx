@@ -8,9 +8,9 @@ const CATEGORY_META: Record<string, { eyebrow: string; description: string }> = 
   Brakes: { eyebrow: "Control", description: "Stopping power, pads, rotors, and hardware." },
   Suspension: { eyebrow: "Ride", description: "Components built for confident handling." },
   Engine: { eyebrow: "Performance", description: "Keep your truck working at its best." },
-  Electrical: { eyebrow: "Systems", description: "Reliable electrical and starting components." },
-  Exterior: { eyebrow: "Body", description: "Exterior parts to keep your truck complete." },
-  Interior: { eyebrow: "Cab", description: "Practical parts for the inside of your truck." },
+  Lighting: { eyebrow: "Visibility", description: "Headlights, taillights, and lighting assemblies." },
+  Exhaust: { eyebrow: "Airflow", description: "Exhaust systems and related hardware." },
+  "Body & Mirrors": { eyebrow: "Exterior", description: "Mirrors, bumpers, and exterior body parts." },
 };
 
 export default async function Home() {
@@ -118,7 +118,7 @@ export default async function Home() {
             return (
               <Link
                 key={cat}
-                href={`/shop?category=${cat.toLowerCase()}`}
+                href={`/shop?category=${encodeURIComponent(cat.toLowerCase())}`}
                 className="group relative min-h-40 overflow-hidden border border-brand-mid/20 bg-brand-light p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-orange hover:shadow-[0_16px_35px_rgba(27,42,56,0.10)] sm:min-h-48 sm:p-6"
               >
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange">{meta.eyebrow}</span>
